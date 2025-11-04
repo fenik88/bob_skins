@@ -215,7 +215,7 @@ async def send_exchange_order(update: Update, context: ContextTypes.DEFAULT_TYPE
         f"💱 New Exchange Order\n"
         f"Order ID: {order_id}\n"
         f"From: @{user.username or user.id}\n"
-        f"Action: {context.user_data.get('exchange_action', 'N/A')}\n"
+        f"Action: {'Buy Yuan' if context.user_data.get('exchange_action') == 'buy_yuan' else 'Sell Yuan' if context.user_data.get('exchange_action') == 'sell_yuan' else 'N/A'}\n"        
         f"Wallet: {context.user_data.get('wallet', 'N/A')}\n"
         f"Amount: {context.user_data.get('amount', 'N/A')}\n"
         f"Currency: {context.user_data.get('currency', 'N/A')}"
