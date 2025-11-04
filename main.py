@@ -283,6 +283,7 @@ def main():
         per_message=False
     )
 
+    application.add_handler(CommandHandler('start', start))  # handles /start globally
     application.add_handler(conv_handler)
     application.run_polling()
 
