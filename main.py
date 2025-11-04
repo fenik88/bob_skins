@@ -243,7 +243,7 @@ async def send_exchange_order(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 # --- Handler setup ---
 def main():
-    application = Application.builder().token("YOUR_BOT_TOKEN_HERE").build()
+    application = Application.builder().token("8587940958:AAH29baZ650g5pnHc9lo9_j3-rwvOoYFiYk").build()
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
