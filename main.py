@@ -280,10 +280,10 @@ def main():
             ],
         },
         fallbacks=[CallbackQueryHandler(main_menu, pattern='^main$')],
-        per_message=False
+        per_message=True
     )
 
-    application.add_handler(CommandHandler('start', start))  # handles /start globally
+   # application.add_handler(CommandHandler('start', start))  # handles /start globally
     application.add_handler(conv_handler)
     application.run_polling()
 
