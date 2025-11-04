@@ -8,7 +8,7 @@ import uuid
 # --- States ---
 MAIN, BUY_SKINS, STEAM_LINK, CONFIRM_ORDER, TOP_UP, EXCHANGE, EXCHANGE_TYPE, WALLET, AMOUNT, SCREENSHOT, CURRENCY, CONFIRM_EXCHANGE = range(12)
 
-ADMIN_USERNAME = "778268974"  # replace with your Telegram username
+ADMIN_CHAT_ID = 778268974  # numeric chat ID, not @username
 
 # --- Start / Main Menu ---
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -17,10 +17,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("Top Up Trading Platform", callback_data='top_up')],
         [InlineKeyboardButton("Exchange Yuan", callback_data='exchange')]
     ]
-    await update.message.reply_text(
-        "Welcome! Choose your type of order:",
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
+    if update.message:
+        await update.message.reply_text(
+            "Welcome! Choose your type of order:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+    elif update.callback_query:
+        query = update.callback_query
+        await query.answer()
+        await query.edit_message_text(
+            "Welcome! Choose your type of order:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
     return MAIN
 
 
@@ -78,7 +86,7 @@ async def send_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Steam Link: {context.user_data.get('steam_link', 'N/A')}"
     )
 
-    await context.bot.send_message(chat_id=ADMIN_USERNAME, text=message_to_admin)
+    await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=message_to_admin)
 
     keyboard = [
         [InlineKeyboardButton("Create Another Order", callback_data='buy_skins')],
@@ -215,13 +223,12 @@ async def send_exchange_order(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     if 'screenshot_file_id' in context.user_data:
         await context.bot.send_photo(
-            chat_id=ADMIN_USERNAME,
+            chat_id=ADMIN_CHAT_ID,
             photo=context.user_data['screenshot_file_id'],
             caption=message_to_admin
         )
     else:
-        await context.bot.send_message(chat_id=ADMIN_USERNAME, text=message_to_admin)
-
+        await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=message_to_admin)
 
     keyboard = [
         [InlineKeyboardButton("Create New Order", callback_data='exchange')],
@@ -236,7 +243,7 @@ async def send_exchange_order(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 # --- Handler setup ---
 def main():
-    application = Application.builder().token("8587940958:AAH29baZ650g5pnHc9lo9_j3-rwvOoYFiYk").build()
+    application = Application.builder().token("YOUR_BOT_TOKEN_HERE").build()
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
@@ -280,10 +287,9 @@ def main():
             ],
         },
         fallbacks=[CallbackQueryHandler(main_menu, pattern='^main$')],
-        per_message=True
+        per_message=False  # ✅ fixed warning
     )
 
-   # application.add_handler(CommandHandler('start', start))  # handles /start globally
     application.add_handler(conv_handler)
     application.run_polling()
 
