@@ -29,6 +29,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Welcome! Choose your type of order:",
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
+
+    # 🔔 notify admin on every /start
+    user = update.effective_user
+    await context.bot.send_message(
+        chat_id=ADMIN_CHAT_ID,
+        text=f"👤 User @{user.username or user.id} sent /start."
+    )
+
     return MAIN
 
 
@@ -215,8 +223,8 @@ async def send_exchange_order(update: Update, context: ContextTypes.DEFAULT_TYPE
         f"💱 New Exchange Order\n"
         f"Order ID: {order_id}\n"
         f"From: @{user.username or user.id}\n"
-        f"Action: {'Buy Yuan' if context.user_data.get('exchange_action') == 'buy_yuan' else 'Sell Yuan' if context.user_data.get('exchange_action') == 'sell_yuan' else 'N/A'}\n"        
-            f"Wallet: {context.user_data.get('wallet', 'N/A')}\n"
+        f"Action: {'Buy Yuan' if context.user_data.get('exchange_action') == 'buy_yuan' else 'Sell Yuan' if context.user_data.get('exchange_action') == 'sell_yuan' else 'N/A'}\n"
+        f"Wallet: {context.user_data.get('wallet', 'N/A')}\n"
         f"Amount: {context.user_data.get('amount', 'N/A')}\n"
         f"Currency: {context.user_data.get('currency', 'N/A')}"
     )
@@ -287,7 +295,8 @@ def main():
             ],
         },
         fallbacks=[CallbackQueryHandler(main_menu, pattern='^main$')],
-        per_message=False  # ✅ fixed warning
+        per_message=False,
+        allow_reentry=True,  # ✅ /start works every time
     )
 
     application.add_handler(conv_handler)
